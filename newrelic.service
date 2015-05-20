@@ -1,0 +1,29 @@
+[Unit]
+Description=New Relic Monitor
+Requires=docker.service
+After=docker.service
+Requires=etcd.service
+After=etcd.service
+
+[Service]
+Restart=always
+TimeoutStartSec=10m
+ExecStartPre=-/usr/bin/env docker kill newrelic
+ExecStartPre=-/usr/bin/env docker rm newrelic
+ExecStartPre=/usr/bin/env docker pull christianbladescb/newrelic
+ExecStartPre=/usr/bin/env etcdctl get /environments/%p > /tmp/%p.env
+ExecStart=/usr/bin/env docker run --name=newrelic --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock
+  -v /proc:/proc -v /sys:/sys -v /dev:/dev \
+  --privileged=true \
+  --net=host \
+  --env-file /tmp/%p.env \
+  -e NRSYSMOND_hostname=%H \
+  christianbladescb/newrelic
+ExecStop=/usr/bin/env docker stop -t 30 newrelic
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+Global=true
