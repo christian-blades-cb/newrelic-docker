@@ -1,4 +1,5 @@
 # New Relic on CoreOS
+[![](https://badge.imagelayers.io/christianbladescb/newrelic-coreos.svg)](https://imagelayers.io/?images=christianbladescb/newrelic-coreos:latest 'Get your own badge on imagelayers.io')
 
 Docker image for New Relic's (beta) docker host monitoring
 
