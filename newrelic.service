@@ -8,13 +8,16 @@ After=etcd.service
 [Service]
 Restart=always
 TimeoutStartSec=10m
+User=core
+
 ExecStartPre=-/usr/bin/env docker kill newrelic
 ExecStartPre=-/usr/bin/env docker rm newrelic
 ExecStartPre=/usr/bin/env docker pull christianbladescb/newrelic-coreos
-ExecStartPre=/usr/bin/env etcdctl get /environments/%p > /tmp/%p.env
+ExecStartPre=/usr/bin/env /bin/sh -c "etcdctl get /environments/%p > '/tmp/%p.env'"
 ExecStart=/usr/bin/env docker run --name=newrelic --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /proc:/proc -v /sys:/sys -v /dev:/dev \
+  -v /sys:/sys -v /dev:/dev \
+  --pid=host \
   --privileged=true \
   --net=host \
   --env-file /tmp/%p.env \
